@@ -1,81 +1,37 @@
-# triage-pr
+# sebastialonso-skills
 
-A Claude Code skill that triages every review and conversation comment on a
-GitHub pull request into one decision table, gets an explicit Approve or
-Ignore call from you on each item, then implements what you approved.
+A personal collection of public [Claude Code](https://claude.com/claude-code)
+skills, distributed as a single plugin marketplace.
 
-See [`plugins/triage-pr/skills/triage-pr/SKILL.md`](plugins/triage-pr/skills/triage-pr/SKILL.md)
-for the full step-by-step behavior.
-
-## Prerequisites
-
-- [Claude Code](https://claude.com/claude-code)
-- [GitHub CLI](https://cli.github.com) (`gh`), installed and authenticated
-  (`gh auth login`) with access to the repo whose PRs you want to triage
-
-The skill checks for both itself before doing anything, but installing it
-still requires `claude` on your PATH.
-
-## Install
-
-Add this repo as a plugin marketplace, then install the plugin from it:
+## Add the marketplace
 
 ```bash
 claude plugin marketplace add sebastialonso/skills
-claude plugin install triage-pr@sebastialonso-skills
 ```
 
 Or, from inside an interactive Claude Code session:
 
 ```
 /plugin marketplace add sebastialonso/skills
-/plugin install triage-pr@sebastialonso-skills
 ```
 
-Restart Claude Code (or start a new session) after installing so the skill
-loads.
+You only need to do this once — after that, install any skill below by
+name.
 
-## Use
+## Skills
 
-From inside a Claude Code session, just ask for it in plain language:
+| Skill | What it does | Install |
+|-------|---------------|---------|
+| [triage-pr](plugins/triage-pr) | Triage every review and conversation comment on a GitHub PR into one decision table, get an explicit Approve/Ignore call on each item, then implement what's approved. | `claude plugin install triage-pr@sebastialonso-skills` |
 
-```
-triage the comments on https://github.com/OWNER/REPO/pull/123
-```
+See each skill's own README (linked above) for detailed prerequisites and
+usage.
 
-or, from within a checkout of the target repo, on the PR for your current
-branch:
-
-```
-triage PR comments
-```
-
-Claude will:
-
-1. Verify `gh` is installed and authenticated.
-2. Fetch every review-thread and conversation comment on the PR (including
-   bot/tool comments — nothing is filtered out except already-resolved
-   review threads).
-3. Present them as a table: a summary of each thread, Claude's own merit
-   analysis of it, and a link to the thread on GitHub.
-4. Ask you to Approve or Ignore each row.
-5. Confirm with you before implementing anything.
-6. Implement only the approved rows, run the project's linter/tests if it
-   has them, and report what was done.
-
-Replying to or resolving the actual GitHub threads is left to you — the
-skill stops after implementing and reporting.
-
-## Update
+## Update / uninstall the marketplace itself
 
 ```bash
 claude plugin marketplace update sebastialonso-skills
-claude plugin update triage-pr
-```
-
-## Uninstall
-
-```bash
-claude plugin uninstall triage-pr
 claude plugin marketplace remove sebastialonso-skills
 ```
+
+Updating or removing an individual skill is covered in its own README.
