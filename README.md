@@ -21,14 +21,14 @@ still requires `claude` on your PATH.
 Add this repo as a plugin marketplace, then install the plugin from it:
 
 ```bash
-claude plugin marketplace add sebastialonso/triage-pr-skill
+claude plugin marketplace add sebastialonso/skills
 claude plugin install triage-pr@sebastialonso-skills
 ```
 
 Or, from inside an interactive Claude Code session:
 
 ```
-/plugin marketplace add sebastialonso/triage-pr-skill
+/plugin marketplace add sebastialonso/skills
 /plugin install triage-pr@sebastialonso-skills
 ```
 
