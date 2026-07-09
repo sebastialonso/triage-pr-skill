@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "triage-pr-skill",
+  "name": "sebastialonso-skills",
   "description": "Personal collection of public Claude Code skills",
   "owner": {
     "name": "Sebastian Gonzalez"

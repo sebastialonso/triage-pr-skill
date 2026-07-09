@@ -22,14 +22,14 @@ Add this repo as a plugin marketplace, then install the plugin from it:
 
 ```bash
 claude plugin marketplace add sebastialonso/triage-pr-skill
-claude plugin install triage-pr@triage-pr-skill
+claude plugin install triage-pr@sebastialonso-skills
 ```
 
 Or, from inside an interactive Claude Code session:
 
 ```
 /plugin marketplace add sebastialonso/triage-pr-skill
-/plugin install triage-pr@triage-pr-skill
+/plugin install triage-pr@sebastialonso-skills
 ```
 
 Restart Claude Code (or start a new session) after installing so the skill
@@ -69,7 +69,7 @@ skill stops after implementing and reporting.
 ## Update
 
 ```bash
-claude plugin marketplace update triage-pr-skill
+claude plugin marketplace update sebastialonso-skills
 claude plugin update triage-pr
 ```
 
@@ -77,5 +77,5 @@ claude plugin update triage-pr
 
 ```bash
 claude plugin uninstall triage-pr
-claude plugin marketplace remove triage-pr-skill
+claude plugin marketplace remove sebastialonso-skills
 ```
