@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "agent-skills",
+  "name": "triage-pr-skill",
   "description": "Personal collection of public Claude Code skills",
   "owner": {
     "name": "Sebastian Gonzalez"
@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "triage-pr",
-      "description": "Triage a GitHub pull request's review and conversation comments into a decision table, get an Approve/Ignore call on each item from the engineer, implement what's approved, then reply to and resolve each thread.",
+      "description": "Triage a GitHub pull request's review and conversation comments into a decision table, get an Approve/Ignore call on each item from the engineer, then implement what's approved.",
       "author": {
         "name": "Sebastian Gonzalez"
       },
