@@ -1,0 +1,9 @@
+{
+  "name": "triage-pr",
+  "version": "0.1.0",
+  "description": "Triage a GitHub pull request's review and conversation comments into a decision table, get an Approve/Ignore call on each item from the engineer, implement what's approved, then reply to and resolve each thread.",
+  "author": {
+    "name": "Sebastian Gonzalez"
+  },
+  "keywords": ["github", "pull-request", "code-review", "triage"]
+}
