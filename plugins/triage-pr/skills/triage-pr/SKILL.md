@@ -1,23 +1,20 @@
 ---
 name: triage-pr
-description: Triage every review and conversation comment on a GitHub pull request into one decision table, get an explicit Approve or Ignore call from the engineer on each item, implement what's approved, then reply to and resolve each thread according to its outcome. Use this whenever the user asks to "triage PR comments", "go through the review feedback", "process comments on PR #N", pastes a GitHub PR URL and asks what to do with the feedback on it, or wants to work through a pile of reviewer comments on a pull request systematically instead of reading them one at a time in the GitHub UI.
+description: Triage every review and conversation comment on a GitHub pull request into one decision table, get an explicit Approve or Ignore call from the engineer on each item, then implement what's approved. Use this whenever the user asks to "triage PR comments", "go through the review feedback", "process comments on PR #N", pastes a GitHub PR URL and asks what to do with the feedback on it, or wants to work through a pile of reviewer comments on a pull request systematically instead of reading them one at a time in the GitHub UI.
 ---
 
 # Triage PR
 
-Pull requests that have been through a few review rounds mix three things
-together: comments still awaiting a decision, comments a coding agent
-already replied to in an earlier pass, and comments that were never more
-than a passing remark. Scrolling GitHub's UI to sort that out is slow and
-error-prone — it's easy to miss a comment, or to implement something the
-engineer never actually signed off on. This skill turns that mess into one
-table, gets an explicit decision on every row before anything is touched,
-implements only what was approved, and closes the loop by replying to and
-resolving each thread.
+Pull requests that have been through a few review rounds pile up comments of
+very different weight: real blocking issues, nitpicks, bot/tool suggestions,
+and things already discussed to death. Scrolling GitHub's UI to sort that
+out is slow and error-prone — it's easy to miss a comment, or to implement
+something the engineer never actually signed off on. This skill turns that
+mess into one table, gets an explicit decision on every row before anything
+is touched, and implements only what was approved.
 
 Do not skip steps or reorder them — implementing before every row has a
-decision, or resolving before implementation is done and confirmed, defeats
-the point of having the engineer sign off at each gate.
+decision defeats the point of having the engineer sign off first.
 
 ## Step 0 — Verify `gh` is installed and authenticated (required)
 
@@ -30,9 +27,8 @@ gh auth status
 If this fails because `gh` isn't installed, stop and tell the engineer to
 install the GitHub CLI (https://cli.github.com) and re-run. If it fails
 because they aren't logged in, stop and tell them to run `gh auth login`
-first. Do not attempt to fetch or post anything until `gh auth status`
-succeeds — every later step shells out to `gh`, and a partial run (e.g.
-fetching comments but failing to reply) is worse than not starting.
+first. Do not attempt to fetch anything until `gh auth status` succeeds —
+the fetch step shells out to `gh`.
 
 ## Step 1 — Identify the PR
 
@@ -59,20 +55,15 @@ python3 <plugin-dir>/skills/triage-pr/scripts/fetch_pr_threads.py OWNER REPO NUM
 This returns JSON with one row per decision-worthy thread — diff-anchored
 review comment threads and top-level PR conversation comments (including
 non-empty review summaries) are both included, each already merged with any
-follow-up replies in the same thread. It already:
+follow-up replies in the same thread. The only filtering it does is dropping
+already-resolved review threads, since those are presumably already
+settled.
 
-- Drops resolved review threads (presumably already settled).
-- Drops threads/groups made up entirely of bot or coding-agent comments —
-  there's no human ask in them to decide on.
-- Folds a coding agent's prior reply into the row it's replying to, so the
-  table shows one unified item per human ask rather than the raw back-and-forth.
-
-The script's bot/agent detection is a login-pattern list at the top of the
-file (`BOT_LOGIN_PATTERNS`). If your org's coding agent posts under a login
-that isn't already covered (the defaults cover common ones like `[bot]`
-suffixes, `copilot`, `claude`, `coderabbitai`), add its login there before
-relying on the fold/drop behavior — otherwise its comments will show up as
-their own rows needing a decision, which is harmless but noisy.
+Include every comment: human reviewers, bot/agent reviewers (CodeRabbit,
+Copilot, coding agents, etc.), and the PR author's own replies all get a
+row. Bot and automated-review comments often carry real, actionable
+analysis — treat them the same as human feedback rather than filtering or
+downgrading them.
 
 If the JSON comes back with zero rows, tell the engineer the PR has nothing
 outstanding to triage and stop here — don't invent rows.
@@ -119,32 +110,7 @@ to be more involved or different in scope than the table suggested once you
 look at the code, flag that to the engineer before proceeding rather than
 quietly doing something else.
 
-## Step 7 — Resolve threads
-
-After implementation is complete (and, if this project has a verify/test
-step, after that passes), ask the engineer explicitly whether you're clear
-to reply-and-resolve every thread now. Once confirmed, for each row call:
-
-```bash
-# review_thread rows (resolve_id and reply_to_comment_id are non-null):
-python3 <plugin-dir>/skills/triage-pr/scripts/apply_pr_decision.py review-thread \
-  OWNER REPO NUMBER <reply_to_comment_id> <resolve_id> "<reply body>"
-
-# general_comment rows (resolve_id is null — reply only, GitHub has no
-# resolve concept for non-diff comments):
-python3 <plugin-dir>/skills/triage-pr/scripts/apply_pr_decision.py general-comment \
-  OWNER REPO NUMBER "<reply body>"
-```
-
-Write a short, specific reply for each row rather than a generic one:
-
-- **Approved**: say what was done and, if useful, reference the commit or
-  the specific change (e.g. "Done in `path/to/file.py` — switched to X
-  because Y.").
-- **Ignored**: say why in one sentence (e.g. "Not doing this — out of scope
-  for this PR" or "Skipping, current behavior is intentional because Z").
-  An honest reason is more useful to the reviewer than a vague brush-off.
-
-`general_comment` rows get a reply but are never "resolved" — there's
-nothing in the GitHub API to resolve for a non-diff comment, so don't claim
-otherwise to the engineer.
+After implementing, run this project's linter/type checker and test suite
+if it has them, fixing any failures before reporting done. Then tell the
+engineer which approved rows were addressed — replying to or resolving the
+actual GitHub threads is left to them.
